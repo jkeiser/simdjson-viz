@@ -3,8 +3,18 @@
 
   export let input: string;
   export let rows: MaskRow[];
+  export let blockStart: number;
+  export let blockSize: number;
 
-  const chars = input.split('');
+  $: blockEnd = blockStart + blockSize;
+  $: chars = input.split('');
+
+  function cellZone(i: number, bStart: number, bEnd: number, shift: number = 0): 'processed' | 'active' | 'future' {
+    const activeEnd = bEnd + shift;
+    if (i < bStart) return 'processed';
+    if (i < activeEnd) return 'active';
+    return 'future';
+  }
 </script>
 
 <div class="mask-grid">
@@ -12,24 +22,44 @@
   <div class="row">
     <span class="label">input</span>
     <span class="cells">
-      {#each chars as ch}
-        <span class="cell input-cell">{ch}</span>
+      {#each chars as ch, i}
+        <span
+          class="cell input-cell"
+          class:zone-processed={cellZone(i, blockStart, blockEnd) === 'processed'}
+          class:zone-active={cellZone(i, blockStart, blockEnd) === 'active'}
+          class:zone-future={cellZone(i, blockStart, blockEnd) === 'future'}
+          class:block-left={i === blockStart}
+          class:block-right={i === blockEnd - 1}
+        >{ch}</span>
       {/each}
     </span>
   </div>
 
   <!-- Mask rows -->
   {#each rows as row}
+    {@const shift = row.shift ?? 0}
     <div class="row">
       <span class="label">{row.label}</span>
       <span class="cells">
         {#each chars as ch, i}
-          <span
-            class="cell"
-            class:mask-on={row.mask[i]}
-            class:mask-off={!row.mask[i]}
-            style:--row-color={row.color}
-          >{ch}</span>
+          {@const zone = cellZone(i, blockStart, blockEnd, shift)}
+          {#if zone === 'future'}
+            <span
+              class="cell blank"
+              class:block-left={i === blockStart}
+              class:block-right={i === blockEnd - 1}
+            ></span>
+          {:else}
+            <span
+              class="cell"
+              class:mask-on={row.mask[i]}
+              class:mask-off={!row.mask[i]}
+              class:zone-processed={zone === 'processed'}
+              class:block-left={i === blockStart}
+              class:block-right={i === blockEnd - 1}
+              style:--row-color={row.color}
+            >{ch}</span>
+          {/if}
         {/each}
       </span>
     </div>
@@ -77,19 +107,54 @@
     box-sizing: border-box;
   }
 
+  /* Block borders */
+  .block-left {
+    border-left: 2px solid #88bbff;
+  }
+
+  .block-right {
+    border-right: 2px solid #88bbff;
+  }
+
+  /* Input row zones */
   .input-cell {
     color: #ddd;
     background: #333;
     border-bottom: 2px solid #555;
   }
 
+  .input-cell.zone-processed {
+    color: rgba(221, 221, 221, 0.6);
+    background: rgba(51, 51, 51, 0.6);
+  }
+
+  .input-cell.zone-future {
+    color: rgba(221, 221, 221, 0.3);
+    background: rgba(51, 51, 51, 0.3);
+  }
+
+  /* Mask row: active */
   .mask-on {
     background: var(--row-color);
     color: #fff;
   }
 
   .mask-off {
-    color: #666;
-    opacity: 0.45;
+    color: rgba(102, 102, 102, 0.45);
+  }
+
+  /* Mask row: processed (dimmed) */
+  .mask-on.zone-processed {
+    background: color-mix(in srgb, var(--row-color) 60%, transparent);
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .mask-off.zone-processed {
+    color: rgba(102, 102, 102, 0.12);
+  }
+
+  /* Mask row: future (blank) */
+  .blank {
+    /* empty cell, just takes up space */
   }
 </style>

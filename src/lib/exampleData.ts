@@ -47,7 +47,7 @@ const stringsMask = maskRanges(len, [2, 3], [10, 22], [26, 45]);
 export const maskRows: MaskRow[] = [
   { label: 'backslash',   color: '#e06c75', mask: backslashMask },
   { label: 'escape',      color: '#d19a66', mask: escapeMask },
-  { label: 'escaped',     color: '#e5c07b', mask: escapedMask },
+  { label: 'escaped',     color: '#e5c07b', mask: escapedMask, shift: 1 },
   { label: 'quotes',      color: '#61afef', mask: quotesMask },
   { label: 'in strings',  color: '#c678dd', mask: stringsMask },
 ];
