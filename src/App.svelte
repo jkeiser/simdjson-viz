@@ -29,11 +29,17 @@
 
   <div class="controls">
     <button on:click={prev} disabled={currentBlock === 0}>&#x25C0; Prev</button>
-    <span class="block-indicator">Block {currentBlock + 1} of {numBlocks}</span>
     <button on:click={next} disabled={currentBlock === numBlocks - 1}>Next &#x25B6;</button>
   </div>
 
-  <MaskGrid input={inputString} rows={maskRows} {blockStart} {blockSize} />
+  <MaskGrid
+    input={inputString}
+    rows={maskRows}
+    {blockStart}
+    {blockSize}
+    blockIndex={currentBlock}
+    {numBlocks}
+  />
 </main>
 
 <style>
@@ -51,13 +57,8 @@
   .controls {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
     margin-bottom: 1rem;
-  }
-
-  .block-indicator {
-    color: #aaa;
-    font-size: 0.9rem;
   }
 
   button {

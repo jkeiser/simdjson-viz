@@ -5,9 +5,15 @@
   export let rows: MaskRow[];
   export let blockStart: number;
   export let blockSize: number;
+  export let blockIndex: number;
+  export let numBlocks: number;
 
   $: blockEnd = blockStart + blockSize;
-  $: chars = input.split('');
+  // Pad to a full block so the last block always has right border
+  $: paddedLength = numBlocks * blockSize;
+  $: chars = input.padEnd(paddedLength, ' ').split('');
+
+  $: spacerWidth = `calc(${blockStart} * 1.4ch + ${blockSize} * 0.7ch)`;
 
   function cellZone(i: number, bStart: number, bEnd: number, shift: number = 0): 'processed' | 'active' | 'future' {
     const activeEnd = bEnd + shift;
@@ -18,6 +24,17 @@
 </script>
 
 <div class="mask-grid">
+  <!-- Block label floating above the active block -->
+  <div class="row block-label-row">
+    <span class="label"></span>
+    <span class="cells">
+      <span class="block-label-spacer" style:width={spacerWidth}></span>
+      <span class="block-label">
+        Block {blockIndex + 1} of {numBlocks}
+      </span>
+    </span>
+  </div>
+
   <!-- Input row -->
   <div class="row">
     <span class="label">input</span>
@@ -105,6 +122,22 @@
     height: 1.8em;
     text-align: center;
     box-sizing: border-box;
+  }
+
+  /* Block label above active block */
+  .block-label-row {
+    margin-bottom: 4px;
+  }
+
+  .block-label-spacer {
+    flex-shrink: 0;
+  }
+
+  .block-label {
+    color: #88bbff;
+    font-size: 11px;
+    white-space: nowrap;
+    transform: translateX(-50%);
   }
 
   /* Block borders */
