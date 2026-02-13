@@ -49,6 +49,8 @@
     }
   }
 
+  let gridEl: HTMLDivElement;
+
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === ' ' || e.key === 'ArrowDown') {
       if (e.shiftKey) stepBackward(); else stepForward();
@@ -57,6 +59,11 @@
     if (e.key === 'ArrowUp') { stepBackward(); e.preventDefault(); }
     if (e.key === 'ArrowLeft') { jumpPrevBlock(); e.preventDefault(); }
     if (e.key === 'ArrowRight') { jumpNextBlock(); e.preventDefault(); }
+  }
+
+  function handleStepClick() {
+    stepForward();
+    gridEl?.focus();
   }
 
   // Viewport and cell measurement for centering
@@ -88,13 +95,11 @@
   }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
-
-<div class="mask-grid">
+<div class="mask-grid" tabindex="0" on:keydown={handleKeydown} bind:this={gridEl}>
   <!-- Block label + Input row, with Step button spanning both -->
   <div class="input-group">
     <span class="label step-label">
-      <button class="step-btn" on:click={stepForward} disabled={atEnd}>Step &#x25B6;</button>
+      <button class="step-btn" on:click={handleStepClick} disabled={atEnd}>Step &#x25B6;</button>
     </span>
     <div class="input-group-cells">
       <!-- Block label -->
@@ -176,6 +181,19 @@
     font-size: 14px;
     line-height: 1;
     padding: 1.5rem;
+    outline: none;
+    border-radius: 4px;
+    position: relative;
+  }
+
+  .mask-grid:hover {
+    outline: 2px solid #ccc;
+    outline-offset: -2px;
+  }
+
+  .mask-grid:focus-within {
+    outline: 2px solid #3366aa;
+    outline-offset: -2px;
   }
 
   .input-group {
@@ -202,13 +220,21 @@
   }
 
   .hints-row {
-    text-align: right;
-    margin-top: 0.5rem;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.4rem;
+    text-align: center;
+    font-size: 10px;
+    visibility: hidden;
+  }
+
+  .mask-grid:focus-within .hints-row {
+    visibility: visible;
   }
 
   .hints {
     color: #999;
-    font-size: 10px;
   }
 
   .step-btn {
