@@ -3,14 +3,28 @@
 
   export let input: string;
   export let rows: MaskRow[];
-  export let blockStart: number;
-  export let blockSize: number;
-  export let blockIndex: number;
-  export let numBlocks: number;
+  export let blockSize: number = 8;
 
+  // Stepping state
+  $: numBlocks = Math.ceil(input.length / blockSize);
+  let currentBlock = 0;
+  $: blockStart = currentBlock * blockSize;
   $: blockEnd = blockStart + blockSize;
   $: paddedLength = numBlocks * blockSize;
   $: chars = input.padEnd(paddedLength, ' ').split('');
+
+  function prev() {
+    if (currentBlock > 0) currentBlock--;
+  }
+
+  function next() {
+    if (currentBlock < numBlocks - 1) currentBlock++;
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === 'ArrowLeft') { prev(); e.preventDefault(); }
+    if (e.key === 'ArrowRight') { next(); e.preventDefault(); }
+  }
 
   // Viewport and cell measurement for centering
   let viewportWidth = 0;
@@ -32,7 +46,19 @@
   }
 </script>
 
+<svelte:window on:keydown={handleKeydown} />
+
 <div class="mask-grid">
+  <!-- Controls row: Prev over labels, Next over cells -->
+  <div class="row controls-row">
+    <span class="label">
+      <button class="step-btn" on:click={prev} disabled={currentBlock === 0}>&#x25C0; Prev</button>
+    </span>
+    <div class="controls">
+      <button class="step-btn" on:click={next} disabled={currentBlock === numBlocks - 1}>Next &#x25B6;</button>
+    </div>
+  </div>
+
   <!-- Block label floating above the active block -->
   <div class="row">
     <span class="label"></span>
@@ -40,7 +66,7 @@
       <div class="cells" style:transform="translateX({translate}px)">
         <span class="block-label-spacer" style:width={spacerWidth}></span>
         <span class="block-label">
-          Block {blockIndex + 1} of {numBlocks}
+          Block {currentBlock + 1} of {numBlocks}
         </span>
       </div>
     </div>
@@ -106,6 +132,39 @@
     padding: 1.5rem;
   }
 
+  .controls-row {
+    margin-bottom: 0.25rem;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .step-btn {
+    background: #2a2a4a;
+    color: #aaa;
+    border: 1px solid #444;
+    border-radius: 3px;
+    padding: 0.2em 0.6em;
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  .step-btn:hover:not(:disabled) {
+    background: #3a3a6a;
+    border-color: #88bbff;
+    color: #ccc;
+  }
+
+  .step-btn:disabled {
+    background: transparent;
+    color: #444;
+    border-color: #333;
+    cursor: default;
+  }
+
   .row {
     display: flex;
     align-items: stretch;
@@ -146,6 +205,7 @@
     text-align: center;
     box-sizing: border-box;
     flex-shrink: 0;
+    transition: color 0.3s ease, background 0.3s ease, border-color 0.3s ease;
   }
 
   /* Block label above active block */
@@ -206,8 +266,4 @@
     color: rgba(102, 102, 102, 0.12);
   }
 
-  /* Mask row: future (blank) */
-  .blank {
-    /* empty cell, just takes up space */
-  }
 </style>
