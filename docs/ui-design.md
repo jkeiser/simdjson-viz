@@ -64,14 +64,8 @@ block were already computed by the previous block, those cells show as
 processed (dimmed) regardless of whether the row is hidden, active, or
 revealed. This avoids blanking data that was already computed.
 
-### Edge Cases
+### Implementation Gotchas
 
-- **Last block padding**: input is padded with spaces to fill the last block,
-  so the right lane border always renders. Matches simdjson's buffer padding.
-- **Dimming via rgba, not opacity**: CSS `opacity` also dims block border lines.
-  Use explicit `rgba()` colors for text and backgrounds instead.
-- **Input divider**: uses `box-shadow: inset 0 -2px 0` instead of
-  `border-bottom` so lane borders render on top of the divider line.
-- **Svelte reactivity**: reactive values like `blockStart` and `blockEnd` must
-  appear directly in template expressions, not hidden inside closure functions,
-  or Svelte won't re-render when they change.
+See comments in `MaskGrid.svelte` for details on: last-block padding,
+rgba vs opacity for dimming, box-shadow for input divider, and Svelte
+reactivity with closure functions.

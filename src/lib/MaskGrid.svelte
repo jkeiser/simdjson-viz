@@ -12,6 +12,7 @@
   $: blockStart = currentBlock * blockSize;
   $: blockEnd = blockStart + blockSize;
   $: paddedLength = numBlocks * blockSize;
+  // Pad input to fill last block so right lane border always renders (matches simdjson's buffer padding)
   $: chars = input.padEnd(paddedLength, ' ').split('');
   $: atStart = currentBlock === 0 && currentRow === 0;
   $: atEnd = currentBlock === numBlocks - 1 && currentRow === rows.length - 1;
@@ -70,6 +71,8 @@
 
   $: spacerWidth = `calc(${blockStart} * 1.4ch + ${blockSize} * 0.7ch)`;
 
+  // Reactive values (blockStart, blockEnd, currentRow) must be passed as explicit parameters,
+  // not captured in closures, or Svelte won't re-render when they change.
   function cellZone(i: number, bStart: number, bEnd: number, shift: number = 0): 'processed' | 'active' | 'future' {
     const activeEnd = bEnd + shift;
     if (i < bStart) return 'processed';
@@ -262,6 +265,7 @@
 
   .cells {
     display: flex;
+    /* max-content so it sizes to full content despite overflow:hidden viewport -- needed for correct width measurement */
     width: max-content;
     transition: transform 0.3s ease;
   }
@@ -315,9 +319,11 @@
   .input-cell {
     color: #ddd;
     background: #333;
+    /* box-shadow instead of border-bottom so lane borders render on top of the divider */
     box-shadow: inset 0 -2px 0 #555;
   }
 
+  /* Dimming uses explicit rgba() instead of CSS opacity, which would also dim lane borders */
   .input-cell.zone-processed {
     color: rgba(221, 221, 221, 0.6);
     background: rgba(51, 51, 51, 0.6);
