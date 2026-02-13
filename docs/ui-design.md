@@ -9,11 +9,11 @@ Each column is one byte position. Rows are labeled on the left.
 
 Navigation has two axes:
 
-- **Row stepping** (Space / Shift+Space / Up / Down / Back+Step buttons): reveals
+- **Row stepping** (Space / Shift+Space / Up / Down / Step button): reveals
   mask rows one at a time within the current block. Pressing Step at the last row
   advances to the next block's first row.
 - **Block jumping** (Left / Right arrows): jumps to the previous/next block.
-  Going back sets the row to the last; going forward sets it to the first.
+  Both directions set the row to the last (showing all masks for that block).
 
 ### Row Visibility
 
@@ -54,9 +54,15 @@ the overflow-hidden viewport -- this is needed for correct width measurement.
 
 ### Shifted Masks
 
-Some mask rows (e.g. "escaped") have `shift: 1`, meaning their active range
-extends past the block boundary by that many positions. The overflow renders
-at full brightness but the block borders stay at `[blockStart, blockEnd)`.
+Some mask rows (e.g. "escaped", "in string") have `shift: 1`, meaning their
+active range extends past the block boundary by that many positions. The
+overflow renders at full brightness but the block borders stay at
+`[blockStart, blockEnd)`.
+
+**Shift carry**: When a shifted row's first `shift` positions in the current
+block were already computed by the previous block, those cells show as
+processed (dimmed) regardless of whether the row is hidden, active, or
+revealed. This avoids blanking data that was already computed.
 
 ### Edge Cases
 
@@ -64,6 +70,8 @@ at full brightness but the block borders stay at `[blockStart, blockEnd)`.
   so the right lane border always renders. Matches simdjson's buffer padding.
 - **Dimming via rgba, not opacity**: CSS `opacity` also dims block border lines.
   Use explicit `rgba()` colors for text and backgrounds instead.
+- **Input divider**: uses `box-shadow: inset 0 -2px 0` instead of
+  `border-bottom` so lane borders render on top of the divider line.
 - **Svelte reactivity**: reactive values like `blockStart` and `blockEnd` must
   appear directly in template expressions, not hidden inside closure functions,
   or Svelte won't re-render when they change.

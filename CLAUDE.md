@@ -4,14 +4,23 @@ Svelte + Vite + TypeScript project visualizing simdjson's stage 1 bitmask algori
 
 ## Structure
 
-- `src/lib/MaskGrid.svelte` -- main visualization component (character grid with mask rows)
+- `src/lib/MaskGrid.svelte` -- main visualization component (character grid with mask rows, owns all state and controls)
+- `src/lib/masks.ts` -- composable mask computation functions (`charEqMask`, `shiftMask`, `andNotMask`, `prefixXorMask`, `escapeMask`, `computeMaskRows`)
+- `src/lib/masks.test.ts` -- vitest tests for mask functions
 - `src/lib/types.ts` -- `MaskRow` type: `{ label, color, mask: boolean[], shift? }`
-- `src/lib/exampleData.ts` -- hardcoded example input string and mask definitions
-- `src/App.svelte` -- top-level layout and step controls
+- `src/lib/exampleData.ts` -- example input string, masks computed via `computeMaskRows`
+- `src/App.svelte` -- top-level layout wrapper (passes props to MaskGrid)
 
-## Running
+## Commands
 
-`npm run dev` starts the Vite dev server with hot reload.
+- `npm run dev` -- Vite dev server with hot reload
+- `npx vitest run` -- run tests
+- `npm run build` -- production build to `dist/`
+
+## Deployment
+
+GitHub Pages via Actions -- pushes to main auto-deploy to johnkeiser.com/simdjson-viz/.
+Vite `base` is set to `/simdjson-viz/` in `vite.config.ts`.
 
 ## Design docs
 
