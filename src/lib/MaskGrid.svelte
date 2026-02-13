@@ -178,7 +178,6 @@
   .input-group {
     display: flex;
     align-items: stretch;
-    margin-bottom: 2px;
   }
 
   .input-group-cells {
@@ -235,7 +234,6 @@
   .row {
     display: flex;
     align-items: stretch;
-    margin-bottom: 2px;
   }
 
   .label {
@@ -295,10 +293,14 @@
   /* Block borders */
   .block-left {
     border-left: 2px solid #88bbff;
+    position: relative;
+    z-index: 1;
   }
 
   .block-right {
     border-right: 2px solid #88bbff;
+    position: relative;
+    z-index: 1;
   }
 
   .block-active-row.block-left {
@@ -313,7 +315,7 @@
   .input-cell {
     color: #ddd;
     background: #333;
-    border-bottom: 2px solid #555;
+    box-shadow: inset 0 -2px 0 #555;
   }
 
   .input-cell.zone-processed {
