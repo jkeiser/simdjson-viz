@@ -5,25 +5,57 @@
   export let rows: MaskRow[];
   export let blockSize: number = 8;
 
-  // Stepping state
+  // Stepping state: block (horizontal) and row (vertical)
   $: numBlocks = Math.ceil(input.length / blockSize);
   let currentBlock = 0;
+  let currentRow = 0;
   $: blockStart = currentBlock * blockSize;
   $: blockEnd = blockStart + blockSize;
   $: paddedLength = numBlocks * blockSize;
   $: chars = input.padEnd(paddedLength, ' ').split('');
+  $: atStart = currentBlock === 0 && currentRow === 0;
+  $: atEnd = currentBlock === numBlocks - 1 && currentRow === rows.length - 1;
 
-  function prev() {
-    if (currentBlock > 0) currentBlock--;
+  function stepForward() {
+    if (currentRow < rows.length - 1) {
+      currentRow++;
+    } else if (currentBlock < numBlocks - 1) {
+      currentBlock++;
+      currentRow = 0;
+    }
   }
 
-  function next() {
-    if (currentBlock < numBlocks - 1) currentBlock++;
+  function stepBackward() {
+    if (currentRow > 0) {
+      currentRow--;
+    } else if (currentBlock > 0) {
+      currentBlock--;
+      currentRow = rows.length - 1;
+    }
+  }
+
+  function jumpPrevBlock() {
+    if (currentBlock > 0) {
+      currentBlock--;
+      currentRow = rows.length - 1;
+    }
+  }
+
+  function jumpNextBlock() {
+    if (currentBlock < numBlocks - 1) {
+      currentBlock++;
+      currentRow = 0;
+    }
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'ArrowLeft') { prev(); e.preventDefault(); }
-    if (e.key === 'ArrowRight') { next(); e.preventDefault(); }
+    if (e.key === ' ' || e.key === 'ArrowDown') {
+      if (e.shiftKey) stepBackward(); else stepForward();
+      e.preventDefault();
+    }
+    if (e.key === 'ArrowUp') { stepBackward(); e.preventDefault(); }
+    if (e.key === 'ArrowLeft') { jumpPrevBlock(); e.preventDefault(); }
+    if (e.key === 'ArrowRight') { jumpNextBlock(); e.preventDefault(); }
   }
 
   // Viewport and cell measurement for centering
@@ -44,18 +76,25 @@
     if (i < activeEnd) return 'active';
     return 'future';
   }
+
+  // For mask rows: whether the row is revealed for the current block
+  function rowVisible(rowIndex: number, cRow: number): 'active' | 'revealed' | 'hidden' {
+    if (rowIndex < cRow) return 'revealed';
+    if (rowIndex === cRow) return 'active';
+    return 'hidden';
+  }
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
 
 <div class="mask-grid">
-  <!-- Controls row: Prev over labels, Next over cells -->
+  <!-- Controls row: Back over labels, Step over cells -->
   <div class="row controls-row">
     <span class="label">
-      <button class="step-btn" on:click={prev} disabled={currentBlock === 0}>&#x25C0; Prev</button>
+      <button class="step-btn" on:click={stepBackward} disabled={atStart}>&#x25C0; Back</button>
     </span>
     <div class="controls">
-      <button class="step-btn" on:click={next} disabled={currentBlock === numBlocks - 1}>Next &#x25B6;</button>
+      <button class="step-btn" on:click={stepForward} disabled={atEnd}>Step &#x25B6;</button>
     </div>
   </div>
 
@@ -92,15 +131,20 @@
   </div>
 
   <!-- Mask rows -->
-  {#each rows as row}
+  {#each rows as row, r}
     {@const shift = row.shift ?? 0}
-    <div class="row">
-      <span class="label">{row.label}</span>
+    {@const visibility = rowVisible(r, currentRow)}
+    <div class="row" class:row-active={visibility === 'active'}>
+      <span
+        class="label"
+        class:label-active={visibility === 'active'}
+        style:--row-color={row.color}
+      >{row.label}</span>
       <div class="cells-viewport">
         <div class="cells" style:transform="translateX({translate}px)">
           {#each chars as ch, i}
             {@const zone = cellZone(i, blockStart, blockEnd, shift)}
-            {#if zone === 'future'}
+            {#if zone === 'future' || (zone === 'active' && visibility === 'hidden')}
               <span
                 class="cell blank"
                 class:block-left={i === blockStart}
@@ -111,9 +155,10 @@
                 class="cell"
                 class:mask-on={row.mask[i]}
                 class:mask-off={!row.mask[i]}
-                class:zone-processed={zone === 'processed'}
+                class:zone-processed={zone === 'processed' || (zone === 'active' && visibility === 'revealed')}
                 class:block-left={i === blockStart}
                 class:block-right={i === blockEnd - 1}
+                class:block-active-row={visibility === 'active' && (i === blockStart || i === blockEnd - 1)}
                 style:--row-color={row.color}
               >{ch}</span>
             {/if}
@@ -184,6 +229,11 @@
     user-select: none;
   }
 
+  .label-active {
+    color: var(--row-color);
+    font-weight: bold;
+  }
+
   .cells-viewport {
     flex: 1;
     overflow: hidden;
@@ -229,6 +279,14 @@
     border-right: 2px solid #88bbff;
   }
 
+  .block-active-row.block-left {
+    border-left-color: var(--row-color);
+  }
+
+  .block-active-row.block-right {
+    border-right-color: var(--row-color);
+  }
+
   /* Input row zones */
   .input-cell {
     color: #ddd;
@@ -265,5 +323,4 @@
   .mask-off.zone-processed {
     color: rgba(102, 102, 102, 0.12);
   }
-
 </style>

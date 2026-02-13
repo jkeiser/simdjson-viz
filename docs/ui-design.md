@@ -5,17 +5,35 @@
 A character-level grid showing a JSON input string with bitmask overlay rows.
 Each column is one byte position. Rows are labeled on the left.
 
-### Block Stepping
+### Stepping: Blocks and Rows
 
-The input is divided into fixed-size blocks (currently 8 bytes). The user steps
-through blocks with prev/next buttons or arrow keys. Controls live inside the
-component: Prev is right-aligned above the row labels, Next is left-aligned
-above the cells. Disabled buttons fade nearly invisible so they don't draw
-attention. The grid shows three zones:
+Navigation has two axes:
 
-- **Processed** (before current block): input and masks shown, slightly dimmed.
-- **Active** (current block): full brightness, vertical blue borders on left/right edges.
-- **Future** (after current block): input shown dimmed, mask rows blank (no text or color).
+- **Row stepping** (Space / Shift+Space / Up / Down / Back+Step buttons): reveals
+  mask rows one at a time within the current block. Pressing Step at the last row
+  advances to the next block's first row.
+- **Block jumping** (Left / Right arrows): jumps to the previous/next block.
+  Going back sets the row to the last; going forward sets it to the first.
+
+### Row Visibility
+
+Within the current block, mask rows have three states:
+
+- **Active** (`r === currentRow`): full brightness, label highlighted in row color
+  and bold, lane borders on that row tinted in row color.
+- **Revealed** (`r < currentRow`): shown but dimmed (same as processed).
+- **Hidden** (`r > currentRow`): cells blank but lane borders stay at full height.
+
+Lane borders always span all rows of the current block (they don't shrink as
+rows are revealed). Only the active row's borders change color.
+
+### Block Zones
+
+The grid shows three horizontal zones:
+
+- **Processed** (before current block): input and all masks shown, dimmed.
+- **Active** (current block): full brightness, vertical blue lane borders.
+- **Future** (after current block): input shown dimmed, mask rows blank.
 
 A "Block N of M" label floats centered above the active block.
 
@@ -24,11 +42,6 @@ A "Block N of M" label floats centered above the active block.
 MaskGrid owns all state and controls. It can be embedded in any container
 (e.g. a fixed-width centered div) with no external dependencies. App.svelte
 just passes `input`, `rows`, and optionally `blockSize`.
-
-### Transitions
-
-Cell colors/backgrounds and the viewport scroll position both animate over
-0.3s when stepping between blocks.
 
 ### Virtual Scrolling
 
