@@ -52,11 +52,13 @@ export function computeMaskRows(input: string): MaskRow[] {
   const quotes = andNotMask(charEqMask(input, '"'), escaped);
   const strings = shiftMask(prefixXorMask(quotes), 1);
 
+  const color = '#8e44ad';
+
   return [
-    { label: 'backslash',  color: '#c0392b', mask: backslash },
-    { label: 'escape',     color: '#d35400', mask: escape },
-    { label: 'escaped',    color: '#b8860b', mask: escaped, shift: 1 },
-    { label: 'quotes',     color: '#2980b9', mask: quotes },
-    { label: 'in string', color: '#8e44ad', mask: strings, shift: 1 },
+    { label: 'backslash',  color, mask: backslash },
+    { label: 'escape',     color, mask: escape },
+    { label: 'escaped',    color, mask: escaped, shift: 1 },
+    { label: 'quotes',     color, mask: quotes },
+    { label: 'in string',  color, mask: strings, shift: 1 },
   ];
 }
