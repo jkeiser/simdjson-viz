@@ -83,27 +83,33 @@ describe('quotes', () => {
   });
 });
 
-describe('in strings', () => {
-  it('includes opening quote, excludes closing quote', () => {
-    expect(bits(getMask('"ab"', 'in strings'))).toBe('111.');
+describe('in string', () => {
+  it('excludes opening quote, includes closing quote', () => {
+    expect(bits(getMask('"ab"', 'in string'))).toBe('.111');
   });
 
   it('handles multiple strings', () => {
     //                              "  a  "  ,  "  b  "
-    expect(bits(getMask('"a","b"', 'in strings'))).toBe('11..11.');
+    expect(bits(getMask('"a","b"', 'in string'))).toBe('.11..11');
   });
 
   it('does not count escaped quotes as string boundaries', () => {
     //                              "  \  "  x  "
-    expect(bits(getMask('"\\\"x"', 'in strings'))).toBe('1111.');
+    expect(bits(getMask('"\\\"x"', 'in string'))).toBe('.1111');
   });
 
   it('handles empty strings', () => {
-    expect(bits(getMask('""', 'in strings'))).toBe('1.');
+    expect(bits(getMask('""', 'in string'))).toBe('.1');
   });
 
   it('everything outside strings is off', () => {
-    expect(bits(getMask('abc', 'in strings'))).toBe('...');
+    expect(bits(getMask('abc', 'in string'))).toBe('...');
+  });
+
+  it('has shift: 1', () => {
+    const rows = computeMaskRows('"a"');
+    const row = rows.find(r => r.label === 'in string');
+    expect(row?.shift).toBe(1);
   });
 });
 
@@ -111,7 +117,7 @@ describe('computeMaskRows', () => {
   it('returns all five mask rows', () => {
     const rows = computeMaskRows('{}');
     const labels = rows.map(r => r.label);
-    expect(labels).toEqual(['backslash', 'escape', 'escaped', 'quotes', 'in strings']);
+    expect(labels).toEqual(['backslash', 'escape', 'escaped', 'quotes', 'in string']);
   });
 
   it('produces correct masks for the example string', () => {
@@ -148,16 +154,19 @@ describe('computeMaskRows', () => {
     expect(q[41]).toBe(false);
     expect(q[45]).toBe(false);
 
-    // String regions: [2,3], [10,22], [26,45]
-    const str = rows.find(r => r.label === 'in strings')!.mask;
-    expect(str[2]).toBe(true);   // opening quote
-    expect(str[3]).toBe(true);   // x
-    expect(str[4]).toBe(false);  // closing quote
-    expect(str[10]).toBe(true);  // opening quote
-    expect(str[22]).toBe(true);  // last char of escaped_text
-    expect(str[23]).toBe(false); // closing quote
-    expect(str[26]).toBe(true);  // opening quote
-    expect(str[45]).toBe(true);  // last char inside string
-    expect(str[46]).toBe(false); // closing quote
+    // String regions (shifted +1): [3,4], [11,23], [27,46]
+    const str = rows.find(r => r.label === 'in string')!.mask;
+    expect(str[2]).toBe(false);  // opening quote (excluded)
+    expect(str[3]).toBe(true);   // x (first char inside)
+    expect(str[4]).toBe(true);   // closing quote (included)
+    expect(str[5]).toBe(false);  // after closing quote
+    expect(str[10]).toBe(false); // opening quote (excluded)
+    expect(str[11]).toBe(true);  // first char of escaped_text
+    expect(str[23]).toBe(true);  // closing quote (included)
+    expect(str[24]).toBe(false); // after closing quote
+    expect(str[26]).toBe(false); // opening quote (excluded)
+    expect(str[27]).toBe(true);  // first char inside string
+    expect(str[46]).toBe(true);  // closing quote (included)
+    expect(str[47]).toBe(false); // after closing quote
   });
 });

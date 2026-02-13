@@ -50,13 +50,13 @@ export function computeMaskRows(input: string): MaskRow[] {
   const escape = escapeMask(backslash);
   const escaped = shiftMask(escape, 1);
   const quotes = andNotMask(charEqMask(input, '"'), escaped);
-  const strings = prefixXorMask(quotes);
+  const strings = shiftMask(prefixXorMask(quotes), 1);
 
   return [
     { label: 'backslash',  color: '#e06c75', mask: backslash },
     { label: 'escape',     color: '#d19a66', mask: escape },
     { label: 'escaped',    color: '#e5c07b', mask: escaped, shift: 1 },
     { label: 'quotes',     color: '#61afef', mask: quotes },
-    { label: 'in strings', color: '#c678dd', mask: strings },
+    { label: 'in string', color: '#c678dd', mask: strings, shift: 1 },
   ];
 }

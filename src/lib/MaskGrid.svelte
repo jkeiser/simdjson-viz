@@ -44,7 +44,7 @@
   function jumpNextBlock() {
     if (currentBlock < numBlocks - 1) {
       currentBlock++;
-      currentRow = 0;
+      currentRow = rows.length - 1;
     }
   }
 
@@ -137,7 +137,8 @@
         <div class="cells" style:transform="translateX({translate}px)">
           {#each chars as ch, i}
             {@const zone = cellZone(i, blockStart, blockEnd, shift)}
-            {#if zone === 'future' || (zone === 'active' && visibility === 'hidden')}
+            {@const shiftCarry = shift > 0 && currentBlock > 0 && i >= blockStart && i < blockStart + shift}
+            {#if zone === 'future' || (zone === 'active' && visibility === 'hidden' && !shiftCarry)}
               <span
                 class="cell blank"
                 class:block-left={i === blockStart}
@@ -148,7 +149,7 @@
                 class="cell"
                 class:mask-on={row.mask[i]}
                 class:mask-off={!row.mask[i]}
-                class:zone-processed={zone === 'processed' || (zone === 'active' && visibility === 'revealed')}
+                class:zone-processed={zone === 'processed' || (zone === 'active' && (visibility === 'revealed' || shiftCarry))}
                 class:block-left={i === blockStart}
                 class:block-right={i === blockEnd - 1}
                 class:block-active-row={visibility === 'active' && (i === blockStart || i === blockEnd - 1)}
