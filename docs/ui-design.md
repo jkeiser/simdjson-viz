@@ -16,30 +16,27 @@ through blocks with prev/next buttons or arrow keys. The grid shows three zones:
 
 A "Block N of M" label floats centered above the active block.
 
+### Virtual Scrolling
+
+The grid viewport clips to available width. All cell rows share a single
+`translateX` offset that centers the active block in view, clamped so no
+empty space appears at either edge. CSS transition animates the slide.
+
+`.cells` uses `width: max-content` so it sizes to full content regardless of
+the overflow-hidden viewport -- this is needed for correct width measurement.
+
 ### Shifted Masks
 
-Some mask rows (e.g. "escaped") have `shift: 1`, meaning their result extends one
-position past the block boundary. The active rendering range for these rows is
-`[blockStart, blockEnd + shift)` -- so the overflow position renders at full
-brightness even though it's outside the block borders. The borders themselves
-stay at `[blockStart, blockEnd)`.
+Some mask rows (e.g. "escaped") have `shift: 1`, meaning their active range
+extends past the block boundary by that many positions. The overflow renders
+at full brightness but the block borders stay at `[blockStart, blockEnd)`.
 
-### Padding the Last Block
+### Edge Cases
 
-The input is padded with spaces to fill the last block completely. This ensures
-the right border always renders, and matches simdjson's actual behavior (it pads
-the input buffer). Without this, the last block may have fewer cells than
-`blockSize` and the right lane marker disappears.
-
-### Mask Cell Styling
-
-- **Mask-on**: colored background (row's color), white text.
-- **Mask-off**: no background, faint text.
-- Dimming uses explicit `rgba()` colors rather than CSS `opacity`, because
-  `opacity` also dims the block border lines.
-
-### Cell Sizing
-
-All cells are `1.4ch` wide in a monospace font so columns align perfectly.
-The block label uses a spacer of `blockStart * 1.4ch + blockSize * 0.7ch`
-(center of block) and `translateX(-50%)` to center regardless of label width.
+- **Last block padding**: input is padded with spaces to fill the last block,
+  so the right lane border always renders. Matches simdjson's buffer padding.
+- **Dimming via rgba, not opacity**: CSS `opacity` also dims block border lines.
+  Use explicit `rgba()` colors for text and backgrounds instead.
+- **Svelte reactivity**: reactive values like `blockStart` and `blockEnd` must
+  appear directly in template expressions, not hidden inside closure functions,
+  or Svelte won't re-render when they change.

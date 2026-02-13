@@ -9,9 +9,18 @@
   export let numBlocks: number;
 
   $: blockEnd = blockStart + blockSize;
-  // Pad to a full block so the last block always has right border
   $: paddedLength = numBlocks * blockSize;
   $: chars = input.padEnd(paddedLength, ' ').split('');
+
+  // Viewport and cell measurement for centering
+  let viewportWidth = 0;
+  let totalCellsWidth = 0;
+
+  $: cellPixelWidth = totalCellsWidth > 0 ? totalCellsWidth / chars.length : 0;
+  $: blockCenterPx = (blockStart + blockSize / 2) * cellPixelWidth;
+  $: rawTranslate = viewportWidth / 2 - blockCenterPx;
+  $: minTranslate = Math.min(0, viewportWidth - totalCellsWidth);
+  $: translate = Math.min(0, Math.max(minTranslate, rawTranslate));
 
   $: spacerWidth = `calc(${blockStart} * 1.4ch + ${blockSize} * 0.7ch)`;
 
@@ -25,31 +34,35 @@
 
 <div class="mask-grid">
   <!-- Block label floating above the active block -->
-  <div class="row block-label-row">
+  <div class="row">
     <span class="label"></span>
-    <span class="cells">
-      <span class="block-label-spacer" style:width={spacerWidth}></span>
-      <span class="block-label">
-        Block {blockIndex + 1} of {numBlocks}
-      </span>
-    </span>
+    <div class="cells-viewport" bind:clientWidth={viewportWidth}>
+      <div class="cells" style:transform="translateX({translate}px)">
+        <span class="block-label-spacer" style:width={spacerWidth}></span>
+        <span class="block-label">
+          Block {blockIndex + 1} of {numBlocks}
+        </span>
+      </div>
+    </div>
   </div>
 
   <!-- Input row -->
   <div class="row">
     <span class="label">input</span>
-    <span class="cells">
-      {#each chars as ch, i}
-        <span
-          class="cell input-cell"
-          class:zone-processed={cellZone(i, blockStart, blockEnd) === 'processed'}
-          class:zone-active={cellZone(i, blockStart, blockEnd) === 'active'}
-          class:zone-future={cellZone(i, blockStart, blockEnd) === 'future'}
-          class:block-left={i === blockStart}
-          class:block-right={i === blockEnd - 1}
-        >{ch}</span>
-      {/each}
-    </span>
+    <div class="cells-viewport">
+      <div class="cells" bind:clientWidth={totalCellsWidth} style:transform="translateX({translate}px)">
+        {#each chars as ch, i}
+          <span
+            class="cell input-cell"
+            class:zone-processed={cellZone(i, blockStart, blockEnd) === 'processed'}
+            class:zone-active={cellZone(i, blockStart, blockEnd) === 'active'}
+            class:zone-future={cellZone(i, blockStart, blockEnd) === 'future'}
+            class:block-left={i === blockStart}
+            class:block-right={i === blockEnd - 1}
+          >{ch}</span>
+        {/each}
+      </div>
+    </div>
   </div>
 
   <!-- Mask rows -->
@@ -57,28 +70,30 @@
     {@const shift = row.shift ?? 0}
     <div class="row">
       <span class="label">{row.label}</span>
-      <span class="cells">
-        {#each chars as ch, i}
-          {@const zone = cellZone(i, blockStart, blockEnd, shift)}
-          {#if zone === 'future'}
-            <span
-              class="cell blank"
-              class:block-left={i === blockStart}
-              class:block-right={i === blockEnd - 1}
-            ></span>
-          {:else}
-            <span
-              class="cell"
-              class:mask-on={row.mask[i]}
-              class:mask-off={!row.mask[i]}
-              class:zone-processed={zone === 'processed'}
-              class:block-left={i === blockStart}
-              class:block-right={i === blockEnd - 1}
-              style:--row-color={row.color}
-            >{ch}</span>
-          {/if}
-        {/each}
-      </span>
+      <div class="cells-viewport">
+        <div class="cells" style:transform="translateX({translate}px)">
+          {#each chars as ch, i}
+            {@const zone = cellZone(i, blockStart, blockEnd, shift)}
+            {#if zone === 'future'}
+              <span
+                class="cell blank"
+                class:block-left={i === blockStart}
+                class:block-right={i === blockEnd - 1}
+              ></span>
+            {:else}
+              <span
+                class="cell"
+                class:mask-on={row.mask[i]}
+                class:mask-off={!row.mask[i]}
+                class:zone-processed={zone === 'processed'}
+                class:block-left={i === blockStart}
+                class:block-right={i === blockEnd - 1}
+                style:--row-color={row.color}
+              >{ch}</span>
+            {/if}
+          {/each}
+        </div>
+      </div>
     </div>
   {/each}
 </div>
@@ -110,8 +125,16 @@
     user-select: none;
   }
 
+  .cells-viewport {
+    flex: 1;
+    overflow: hidden;
+    min-width: 0;
+  }
+
   .cells {
     display: flex;
+    width: max-content;
+    transition: transform 0.3s ease;
   }
 
   .cell {
@@ -122,13 +145,10 @@
     height: 1.8em;
     text-align: center;
     box-sizing: border-box;
+    flex-shrink: 0;
   }
 
   /* Block label above active block */
-  .block-label-row {
-    margin-bottom: 4px;
-  }
-
   .block-label-spacer {
     flex-shrink: 0;
   }
