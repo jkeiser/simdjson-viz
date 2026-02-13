@@ -88,44 +88,37 @@
 <svelte:window on:keydown={handleKeydown} />
 
 <div class="mask-grid">
-  <!-- Controls row: Back over labels, Step over cells -->
-  <div class="row controls-row">
-    <span class="label">
-      <button class="step-btn" on:click={stepBackward} disabled={atStart}>&#x25C0; Back</button>
-    </span>
-    <div class="controls">
+  <!-- Block label + Input row, with Step button spanning both -->
+  <div class="input-group">
+    <span class="label step-label">
       <button class="step-btn" on:click={stepForward} disabled={atEnd}>Step &#x25B6;</button>
-    </div>
-  </div>
-
-  <!-- Block label floating above the active block -->
-  <div class="row">
-    <span class="label"></span>
-    <div class="cells-viewport" bind:clientWidth={viewportWidth}>
-      <div class="cells" style:transform="translateX({translate}px)">
-        <span class="block-label-spacer" style:width={spacerWidth}></span>
-        <span class="block-label">
-          Block {currentBlock + 1} of {numBlocks}
-        </span>
+    </span>
+    <div class="input-group-cells">
+      <!-- Block label -->
+      <div class="block-label-row">
+        <div class="cells-viewport" bind:clientWidth={viewportWidth}>
+          <div class="cells" style:transform="translateX({translate}px)">
+            <span class="block-label-spacer" style:width={spacerWidth}></span>
+            <span class="block-label">
+              Block {currentBlock + 1} of {numBlocks}
+            </span>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Input row -->
-  <div class="row">
-    <span class="label">input</span>
-    <div class="cells-viewport">
-      <div class="cells" bind:clientWidth={totalCellsWidth} style:transform="translateX({translate}px)">
-        {#each chars as ch, i}
-          <span
-            class="cell input-cell"
-            class:zone-processed={cellZone(i, blockStart, blockEnd) === 'processed'}
-            class:zone-active={cellZone(i, blockStart, blockEnd) === 'active'}
-            class:zone-future={cellZone(i, blockStart, blockEnd) === 'future'}
-            class:block-left={i === blockStart}
-            class:block-right={i === blockEnd - 1}
-          >{ch}</span>
-        {/each}
+      <!-- Input cells -->
+      <div class="cells-viewport">
+        <div class="cells" bind:clientWidth={totalCellsWidth} style:transform="translateX({translate}px)">
+          {#each chars as ch, i}
+            <span
+              class="cell input-cell"
+              class:zone-processed={cellZone(i, blockStart, blockEnd) === 'processed'}
+              class:zone-active={cellZone(i, blockStart, blockEnd) === 'active'}
+              class:zone-future={cellZone(i, blockStart, blockEnd) === 'future'}
+              class:block-left={i === blockStart}
+              class:block-right={i === blockEnd - 1}
+            >{ch}</span>
+          {/each}
+        </div>
       </div>
     </div>
   </div>
@@ -167,6 +160,10 @@
       </div>
     </div>
   {/each}
+
+  <div class="hints-row">
+    <span class="hints">Keyboard: Space / &#x2191;&#x2193; step &middot; &#x2190;&#x2192; jump block</span>
+  </div>
 </div>
 
 <style>
@@ -177,14 +174,38 @@
     padding: 1.5rem;
   }
 
-  .controls-row {
-    margin-bottom: 0.25rem;
+  .input-group {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 2px;
   }
 
-  .controls {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
+  .input-group-cells {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .block-label-row {
+    margin-bottom: 4px;
+  }
+
+  .label.step-label {
+    padding: 0 12px 0 0;
+  }
+
+  .label.step-label .step-btn {
+    width: 100%;
+    height: 100%;
+  }
+
+  .hints-row {
+    text-align: right;
+    margin-top: 0.5rem;
+  }
+
+  .hints {
+    color: #555;
+    font-size: 10px;
   }
 
   .step-btn {
@@ -192,8 +213,8 @@
     color: #aaa;
     border: 1px solid #444;
     border-radius: 3px;
-    padding: 0.2em 0.6em;
-    font-size: 11px;
+    padding: 0.3em 1em;
+    font-size: 16px;
     cursor: pointer;
   }
 
