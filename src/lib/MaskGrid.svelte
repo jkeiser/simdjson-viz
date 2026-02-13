@@ -207,14 +207,14 @@
   }
 
   .hints {
-    color: #555;
+    color: #999;
     font-size: 10px;
   }
 
   .step-btn {
-    background: #2a2a4a;
-    color: #aaa;
-    border: 1px solid #444;
+    background: #e8eef6;
+    color: #555;
+    border: 1px solid #bbb;
     border-radius: 3px;
     padding: 0.3em 1em;
     font-size: 16px;
@@ -222,15 +222,15 @@
   }
 
   .step-btn:hover:not(:disabled) {
-    background: #3a3a6a;
-    border-color: #88bbff;
-    color: #ccc;
+    background: #d0daea;
+    border-color: #3366aa;
+    color: #333;
   }
 
   .step-btn:disabled {
     background: transparent;
-    color: #444;
-    border-color: #333;
+    color: #ccc;
+    border-color: #ddd;
     cursor: default;
   }
 
@@ -244,7 +244,7 @@
     flex-shrink: 0;
     padding: 4px 12px 4px 0;
     text-align: right;
-    color: #888;
+    color: #777;
     font-size: 12px;
     display: flex;
     align-items: center;
@@ -288,7 +288,7 @@
   }
 
   .block-label {
-    color: #88bbff;
+    color: #3366aa;
     font-size: 11px;
     white-space: nowrap;
     transform: translateX(-50%);
@@ -296,13 +296,13 @@
 
   /* Block borders */
   .block-left {
-    border-left: 2px solid #88bbff;
+    border-left: 2px solid #3366aa;
     position: relative;
     z-index: 1;
   }
 
   .block-right {
-    border-right: 2px solid #88bbff;
+    border-right: 2px solid #3366aa;
     position: relative;
     z-index: 1;
   }
@@ -317,21 +317,21 @@
 
   /* Input row zones */
   .input-cell {
-    color: #ddd;
-    background: #333;
+    color: #222;
+    background: #e8e8e8;
     /* box-shadow instead of border-bottom so lane borders render on top of the divider */
-    box-shadow: inset 0 -2px 0 #555;
+    box-shadow: inset 0 -2px 0 #bbb;
   }
 
   /* Dimming uses explicit rgba() instead of CSS opacity, which would also dim lane borders */
   .input-cell.zone-processed {
-    color: rgba(221, 221, 221, 0.6);
-    background: rgba(51, 51, 51, 0.6);
+    color: rgba(34, 34, 34, 0.5);
+    background: rgba(232, 232, 232, 0.5);
   }
 
   .input-cell.zone-future {
-    color: rgba(221, 221, 221, 0.3);
-    background: rgba(51, 51, 51, 0.3);
+    color: rgba(34, 34, 34, 0.25);
+    background: rgba(232, 232, 232, 0.25);
   }
 
   /* Mask row: active */
@@ -341,16 +341,16 @@
   }
 
   .mask-off {
-    color: rgba(102, 102, 102, 0.45);
+    color: rgba(150, 150, 150, 0.5);
   }
 
   /* Mask row: processed (dimmed) */
   .mask-on.zone-processed {
-    background: color-mix(in srgb, var(--row-color) 60%, transparent);
-    color: rgba(255, 255, 255, 0.6);
+    background: color-mix(in srgb, var(--row-color) 40%, transparent);
+    color: rgba(255, 255, 255, 0.7);
   }
 
   .mask-off.zone-processed {
-    color: rgba(102, 102, 102, 0.12);
+    color: rgba(150, 150, 150, 0.2);
   }
 </style>

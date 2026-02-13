@@ -53,10 +53,10 @@ export function computeMaskRows(input: string): MaskRow[] {
   const strings = shiftMask(prefixXorMask(quotes), 1);
 
   return [
-    { label: 'backslash',  color: '#e06c75', mask: backslash },
-    { label: 'escape',     color: '#d19a66', mask: escape },
-    { label: 'escaped',    color: '#e5c07b', mask: escaped, shift: 1 },
-    { label: 'quotes',     color: '#61afef', mask: quotes },
-    { label: 'in string', color: '#c678dd', mask: strings, shift: 1 },
+    { label: 'backslash',  color: '#c0392b', mask: backslash },
+    { label: 'escape',     color: '#d35400', mask: escape },
+    { label: 'escaped',    color: '#b8860b', mask: escaped, shift: 1 },
+    { label: 'quotes',     color: '#2980b9', mask: quotes },
+    { label: 'in string', color: '#8e44ad', mask: strings, shift: 1 },
   ];
 }
