@@ -41,7 +41,8 @@ A "Block N of M" label floats centered above the active block.
 
 MaskGrid owns all state and controls. It can be embedded in any container
 (e.g. a fixed-width centered div) with no external dependencies. App.svelte
-just passes `input`, `rows`, and optionally `blockSize`.
+just passes `input`, `rows`, and optionally `blockSize`, `initialBlock`, and
+`initialRow` (both default to 0 for starting at the beginning).
 
 Multiple MaskGrid instances can coexist on the same page. Keyboard events
 are scoped to the focused grid (the root div is `tabindex="0"` with a local
