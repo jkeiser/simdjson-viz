@@ -4,11 +4,13 @@
   export let input: string;
   export let rows: MaskRow[];
   export let blockSize: number = 8;
+  export let initialBlock: number = 0;
+  export let initialRow: number = 0;
 
   // Stepping state: block (horizontal) and row (vertical)
   $: numBlocks = Math.ceil(input.length / blockSize);
-  let currentBlock = 0;
-  let currentRow = 0;
+  let currentBlock = initialBlock;
+  let currentRow = initialRow;
   $: blockStart = currentBlock * blockSize;
   $: blockEnd = blockStart + blockSize;
   $: paddedLength = numBlocks * blockSize;
