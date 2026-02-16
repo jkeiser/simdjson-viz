@@ -2,6 +2,7 @@
   import { onDestroy } from 'svelte';
   import type { MaskRow } from './types';
 
+  export let title: string = '';
   export let input: string;
   export let rows: MaskRow[];
   export let blockSize: number = 8;
@@ -144,6 +145,9 @@
 </script>
 
 <div class="mask-grid" tabindex="0" on:keydown={handleKeydown} on:mouseleave={() => hoverBlock = null} bind:this={gridEl}>
+  {#if title}
+  <div class="grid-title">{title}</div>
+  {/if}
   <!-- Block label -->
   {#if numBlocks > 1}
   <div class="block-label-row">
@@ -265,6 +269,14 @@
   .mask-grid:focus-within {
     outline: 2px solid #3366aa;
     outline-offset: -2px;
+  }
+
+  .grid-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 0.5rem;
+    text-align: center;
   }
 
   .input-group {

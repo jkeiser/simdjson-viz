@@ -8,8 +8,7 @@ Svelte + Vite + TypeScript project visualizing simdjson's stage 1 bitmask algori
 - `src/lib/masks.ts` -- composable mask computation functions (`charEqMask`, `shiftMask`, `andNotMask`, `prefixXorMask`, `escapeMask`, `computeMaskRows`)
 - `src/lib/masks.test.ts` -- vitest tests for mask functions
 - `src/lib/types.ts` -- `MaskRow` type: `{ label, color, mask: boolean[], shift? }`
-- `src/lib/exampleData.ts` -- example input string, masks computed via `computeMaskRows`
-- `src/App.svelte` -- top-level layout wrapper (passes props to MaskGrid)
+- `src/App.svelte` -- top-level layout wrapper (computes masks inline, passes props to MaskGrid)
 
 ## Commands
 
