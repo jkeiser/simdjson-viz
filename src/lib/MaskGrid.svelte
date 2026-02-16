@@ -36,6 +36,10 @@
     if (playing) {
       stopPlay();
     } else {
+      if (atEnd) {
+        currentBlock = 0;
+        currentRow = 0;
+      }
       playing = true;
       playInterval = setInterval(() => {
         if (atEnd) {
@@ -43,7 +47,7 @@
         } else {
           stepForward();
         }
-      }, 800);
+      }, 600);
     }
     gridEl?.focus();
   }
@@ -140,48 +144,49 @@
 </script>
 
 <div class="mask-grid" tabindex="0" on:keydown={handleKeydown} on:mouseleave={() => hoverBlock = null} bind:this={gridEl}>
-  <!-- Block label + Input row, with Step button spanning both -->
+  <!-- Block label -->
+  {#if numBlocks > 1}
+  <div class="block-label-row">
+    <span class="label"></span>
+    <div class="cells-viewport">
+      <div class="cells" style:transform="translateX({translate}px)">
+        <span class="block-label-spacer" style:width={spacerWidth}></span>
+        <span class="block-label">
+          Block {currentBlock + 1} of {numBlocks}
+        </span>
+      </div>
+    </div>
+  </div>
+  {/if}
+
+  <!-- Controls + Input row -->
   <div class="input-group">
     <span class="label step-label">
       <span class="controls">
-        <button class="ctrl-btn" on:click={handleStepClick} disabled={atEnd}>&#x25B6;&#x275A;</button>
-        <button class="ctrl-btn" on:click={togglePlay} disabled={atEnd && !playing}>{playing ? '\u23F8' : '\u25B6'}</button>
+        <button class="ctrl-btn" class:ctrl-restart={atEnd && !playing} on:click={togglePlay}>{playing ? '\u23F8' : atEnd ? '\u21BB' : '\u25B6'}</button>
+        {#if !atEnd}
+        <button class="ctrl-btn" on:click={handleStepClick}>&#x25B6;&#x275A;</button>
+        {/if}
       </span>
     </span>
-    <div class="input-group-cells">
-      <!-- Block label -->
-      {#if numBlocks > 1}
-      <div class="block-label-row">
-        <div class="cells-viewport">
-          <div class="cells" style:transform="translateX({translate}px)">
-            <span class="block-label-spacer" style:width={spacerWidth}></span>
-            <span class="block-label">
-              Block {currentBlock + 1} of {numBlocks}
-            </span>
-          </div>
-        </div>
-      </div>
-      {/if}
-      <!-- Input cells -->
-      <div class="cells-viewport" bind:clientWidth={viewportWidth}>
-        <div class="cells" bind:clientWidth={totalCellsWidth} style:transform="translateX({translate}px)">
-          {#each chars as ch, i}
-            {@const hoverLeft = hoverBlock !== null && hoverBlock !== currentBlock && i === hoverBlock * blockSize}
-            {@const hoverRight = hoverBlock !== null && hoverBlock !== currentBlock && i === (hoverBlock + 1) * blockSize - 1}
-            <span
-              class="cell input-cell clickable"
-              class:zone-processed={cellZone(i, blockStart, blockEnd) === 'processed'}
-              class:zone-active={cellZone(i, blockStart, blockEnd) === 'active'}
-              class:zone-future={cellZone(i, blockStart, blockEnd) === 'future'}
-              class:block-left={i === blockStart}
-              class:block-right={i === blockEnd - 1}
-              class:hover-block-left={hoverLeft}
-              class:hover-block-right={hoverRight}
-              on:mouseenter={() => hoverBlock = Math.floor(i / blockSize)}
-              on:click={() => handleCellClick(Math.floor(i / blockSize), rows.length - 1)}
-            >{ch}</span>
-          {/each}
-        </div>
+    <div class="cells-viewport" bind:clientWidth={viewportWidth}>
+      <div class="cells" bind:clientWidth={totalCellsWidth} style:transform="translateX({translate}px)">
+        {#each chars as ch, i}
+          {@const hoverLeft = hoverBlock !== null && hoverBlock !== currentBlock && i === hoverBlock * blockSize}
+          {@const hoverRight = hoverBlock !== null && hoverBlock !== currentBlock && i === (hoverBlock + 1) * blockSize - 1}
+          <span
+            class="cell input-cell clickable"
+            class:zone-processed={cellZone(i, blockStart, blockEnd) === 'processed'}
+            class:zone-active={cellZone(i, blockStart, blockEnd) === 'active'}
+            class:zone-future={cellZone(i, blockStart, blockEnd) === 'future'}
+            class:block-left={i === blockStart}
+            class:block-right={i === blockEnd - 1}
+            class:hover-block-left={hoverLeft}
+            class:hover-block-right={hoverRight}
+            on:mouseenter={() => hoverBlock = Math.floor(i / blockSize)}
+            on:click={() => handleCellClick(Math.floor(i / blockSize), rows.length - 1)}
+          >{ch}</span>
+        {/each}
       </div>
     </div>
   </div>
@@ -192,9 +197,10 @@
     {@const visibility = rowVisible(r, currentRow)}
     <div class="row" class:row-active={visibility === 'active'}>
       <span
-        class="label"
+        class="label clickable"
         class:label-active={visibility === 'active'}
         style:--row-color={row.color}
+        on:click={() => handleCellClick(currentBlock, r)}
       >{row.label}</span>
       <div class="cells-viewport">
         <div class="cells" style:transform="translateX({translate}px)">
@@ -266,12 +272,8 @@
     align-items: stretch;
   }
 
-  .input-group-cells {
-    flex: 1;
-    min-width: 0;
-  }
-
   .block-label-row {
+    display: flex;
     margin-bottom: 4px;
   }
 
@@ -284,6 +286,7 @@
     gap: 2px;
     height: 100%;
     align-items: center;
+    justify-content: flex-end;
   }
 
   .ctrl-btn {
@@ -311,8 +314,14 @@
     visibility: hidden;
   }
 
+  .ctrl-btn.ctrl-restart {
+    visibility: hidden;
+  }
+
   .mask-grid:hover .ctrl-btn:disabled,
-  .mask-grid:focus-within .ctrl-btn:disabled {
+  .mask-grid:focus-within .ctrl-btn:disabled,
+  .mask-grid:hover .ctrl-btn.ctrl-restart,
+  .mask-grid:focus-within .ctrl-btn.ctrl-restart {
     visibility: visible;
   }
 
@@ -382,7 +391,7 @@
     transition: color 0.3s ease, background 0.3s ease;
   }
 
-  .cell.clickable {
+  .clickable {
     cursor: pointer;
   }
 
