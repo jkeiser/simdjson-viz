@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import type { MaskRow } from './types';
 
   export let input: string;
@@ -18,6 +19,36 @@
   $: chars = input.padEnd(paddedLength, ' ').split('');
   $: atStart = currentBlock === 0 && currentRow === 0;
   $: atEnd = currentBlock === numBlocks - 1 && currentRow === rows.length - 1;
+
+  // Auto-play state
+  let playing = false;
+  let playInterval: ReturnType<typeof setInterval> | null = null;
+
+  function stopPlay() {
+    playing = false;
+    if (playInterval !== null) {
+      clearInterval(playInterval);
+      playInterval = null;
+    }
+  }
+
+  function togglePlay() {
+    if (playing) {
+      stopPlay();
+    } else {
+      playing = true;
+      playInterval = setInterval(() => {
+        if (atEnd) {
+          stopPlay();
+        } else {
+          stepForward();
+        }
+      }, 800);
+    }
+    gridEl?.focus();
+  }
+
+  onDestroy(() => stopPlay());
 
   function stepForward() {
     if (currentRow < rows.length - 1) {
@@ -64,17 +95,20 @@
   }
 
   function handleStepClick() {
+    stopPlay();
     stepForward();
     gridEl?.focus();
   }
 
   function handleRewindClick() {
+    stopPlay();
     currentBlock = 0;
     currentRow = 0;
     gridEl?.focus();
   }
 
   function handleFastForwardClick() {
+    stopPlay();
     currentBlock = numBlocks - 1;
     currentRow = rows.length - 1;
     gridEl?.focus();
@@ -115,7 +149,8 @@
     <span class="label step-label">
       <span class="controls">
         <button class="ctrl-btn" on:click={handleRewindClick} disabled={atStart}>&#x23EE;</button>
-        <button class="ctrl-btn" on:click={handleStepClick} disabled={atEnd}>&#x25B6;</button>
+        <button class="ctrl-btn" on:click={handleStepClick} disabled={atEnd}>&#x25B6;&#x275A;</button>
+        <button class="ctrl-btn" on:click={togglePlay} disabled={atEnd && !playing}>{playing ? '\u23F8' : '\u25B6'}</button>
         <button class="ctrl-btn" on:click={handleFastForwardClick} disabled={atEnd}>&#x23ED;</button>
       </span>
     </span>
