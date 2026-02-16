@@ -14,7 +14,9 @@ Navigation has two axes:
   advances to the next block's first row.
 - **Block jumping** (Left / Right arrows): jumps to the previous/next block.
   Both directions set the row to the last (showing all masks for that block).
-- **Rewind / Fast-forward**: buttons to jump to the very beginning or end.
+- **Rewind / Fast-forward**: removed; replaced by click-to-jump.
+- **Click-to-jump**: clicking any cell jumps to that block and row. Clicking
+  an input cell jumps to that block's last row (fully revealed).
 - **Play**: auto-steps forward at ~800ms intervals. Toggles to a pause
   button while playing. Stops at the end or when any other control is used.
 
@@ -43,7 +45,7 @@ only a single block, the label is hidden.
 
 ### Controls Visibility
 
-The four control buttons (rewind, step, play, fast-forward) are hidden when
+The two control buttons (step and play) are hidden when
 disabled (i.e. at the start or end of the sequence) unless the grid is
 hovered or focused. This keeps the grid clean when fully revealed.
 

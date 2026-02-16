@@ -100,19 +100,15 @@
     gridEl?.focus();
   }
 
-  function handleRewindClick() {
+  function handleCellClick(block: number, row: number) {
     stopPlay();
-    currentBlock = 0;
-    currentRow = 0;
+    currentBlock = block;
+    currentRow = row;
     gridEl?.focus();
   }
 
-  function handleFastForwardClick() {
-    stopPlay();
-    currentBlock = numBlocks - 1;
-    currentRow = rows.length - 1;
-    gridEl?.focus();
-  }
+  // Hover state for ghost lane borders
+  let hoverBlock: number | null = null;
 
   // Viewport and cell measurement for centering
   let viewportWidth = 0;
@@ -143,15 +139,13 @@
   }
 </script>
 
-<div class="mask-grid" tabindex="0" on:keydown={handleKeydown} bind:this={gridEl}>
+<div class="mask-grid" tabindex="0" on:keydown={handleKeydown} on:mouseleave={() => hoverBlock = null} bind:this={gridEl}>
   <!-- Block label + Input row, with Step button spanning both -->
   <div class="input-group">
     <span class="label step-label">
       <span class="controls">
-        <button class="ctrl-btn" on:click={handleRewindClick} disabled={atStart}>&#x23EE;</button>
         <button class="ctrl-btn" on:click={handleStepClick} disabled={atEnd}>&#x25B6;&#x275A;</button>
         <button class="ctrl-btn" on:click={togglePlay} disabled={atEnd && !playing}>{playing ? '\u23F8' : '\u25B6'}</button>
-        <button class="ctrl-btn" on:click={handleFastForwardClick} disabled={atEnd}>&#x23ED;</button>
       </span>
     </span>
     <div class="input-group-cells">
@@ -172,13 +166,19 @@
       <div class="cells-viewport" bind:clientWidth={viewportWidth}>
         <div class="cells" bind:clientWidth={totalCellsWidth} style:transform="translateX({translate}px)">
           {#each chars as ch, i}
+            {@const hoverLeft = hoverBlock !== null && hoverBlock !== currentBlock && i === hoverBlock * blockSize}
+            {@const hoverRight = hoverBlock !== null && hoverBlock !== currentBlock && i === (hoverBlock + 1) * blockSize - 1}
             <span
-              class="cell input-cell"
+              class="cell input-cell clickable"
               class:zone-processed={cellZone(i, blockStart, blockEnd) === 'processed'}
               class:zone-active={cellZone(i, blockStart, blockEnd) === 'active'}
               class:zone-future={cellZone(i, blockStart, blockEnd) === 'future'}
               class:block-left={i === blockStart}
               class:block-right={i === blockEnd - 1}
+              class:hover-block-left={hoverLeft}
+              class:hover-block-right={hoverRight}
+              on:mouseenter={() => hoverBlock = Math.floor(i / blockSize)}
+              on:click={() => handleCellClick(Math.floor(i / blockSize), rows.length - 1)}
             >{ch}</span>
           {/each}
         </div>
@@ -201,22 +201,32 @@
           {#each chars as ch, i}
             {@const zone = cellZone(i, blockStart, blockEnd, shift)}
             {@const shiftCarry = shift > 0 && currentBlock > 0 && i >= blockStart && i < blockStart + shift}
+            {@const hoverLeft = hoverBlock !== null && hoverBlock !== currentBlock && i === hoverBlock * blockSize}
+            {@const hoverRight = hoverBlock !== null && hoverBlock !== currentBlock && i === (hoverBlock + 1) * blockSize - 1}
             {#if zone === 'future' || (zone === 'active' && visibility === 'hidden' && !shiftCarry)}
               <span
-                class="cell blank"
+                class="cell blank clickable"
                 class:block-left={i === blockStart}
                 class:block-right={i === blockEnd - 1}
+                class:hover-block-left={hoverLeft}
+                class:hover-block-right={hoverRight}
+                on:mouseenter={() => hoverBlock = Math.floor(i / blockSize)}
+                on:click={() => handleCellClick(Math.floor(i / blockSize), r)}
               ></span>
             {:else}
               <span
-                class="cell"
+                class="cell clickable"
                 class:mask-on={row.mask[i]}
                 class:mask-off={!row.mask[i]}
                 class:zone-processed={zone === 'processed' || (zone === 'active' && (visibility === 'revealed' || shiftCarry))}
                 class:block-left={i === blockStart}
                 class:block-right={i === blockEnd - 1}
+                class:hover-block-left={hoverLeft}
+                class:hover-block-right={hoverRight}
                 class:block-active-row={visibility === 'active' && (i === blockStart || i === blockEnd - 1)}
                 style:--row-color={row.color}
+                on:mouseenter={() => hoverBlock = Math.floor(i / blockSize)}
+                on:click={() => handleCellClick(Math.floor(i / blockSize), r)}
               >{ch}</span>
             {/if}
           {/each}
@@ -369,7 +379,11 @@
     text-align: center;
     box-sizing: border-box;
     flex-shrink: 0;
-    transition: color 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+    transition: color 0.3s ease, background 0.3s ease;
+  }
+
+  .cell.clickable {
+    cursor: pointer;
   }
 
   /* Block label above active block */
@@ -403,6 +417,19 @@
 
   .block-active-row.block-right {
     border-right-color: var(--row-color);
+  }
+
+  /* Ghost lane borders on hover */
+  .hover-block-left {
+    border-left: 2px solid rgba(51, 102, 170, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .hover-block-right {
+    border-right: 2px solid rgba(51, 102, 170, 0.3);
+    position: relative;
+    z-index: 1;
   }
 
   /* Input row zones */
