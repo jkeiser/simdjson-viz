@@ -45,7 +45,7 @@ function escapeMask(backslash: boolean[]): boolean[] {
   return escape;
 }
 
-export function computeMaskRows(input: string): MaskRow[] {
+export function computeMaskRows(input: string, names: string[]): MaskRow[] {
   const rawQuotes = charEqMask(input, '"');
   const backslash = charEqMask(input, '\\');
   const escape = escapeMask(backslash);
@@ -55,12 +55,14 @@ export function computeMaskRows(input: string): MaskRow[] {
 
   const color = '#8e44ad';
 
-  return [
-    { label: 'raw quotes', color, mask: rawQuotes },
+  const allRows: MaskRow[] = [
     { label: 'backslash',  color, mask: backslash },
     { label: 'escape',     color, mask: escape },
     { label: 'escaped',    color, mask: escaped, shift: 1 },
+    { label: 'raw quotes', color, mask: rawQuotes },
     { label: 'quotes',     color, mask: quotes },
     { label: 'in string',  color, mask: strings, shift: 1 },
   ];
+
+  return names.map(name => allRows.find(r => r.label === name)!);
 }

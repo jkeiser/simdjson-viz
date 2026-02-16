@@ -4,12 +4,11 @@
 
   // Inline escape example
   const escapeExampleInput = '"\\""';
-  const escapeExampleAllRows = computeMaskRows(escapeExampleInput);
-  const escapeExampleRows = [0, 1, 3, 4].map(i => escapeExampleAllRows[i]);
+  const escapeExampleRows = computeMaskRows(escapeExampleInput, ['backslash', 'escaped', 'raw quotes', 'quotes']);
 
   // Main example
   const inputString = '{ "x": 100000, "esc": "\\\\\\"", "long": "foo\nbar\nbaz" }';
-  const maskRows = computeMaskRows(inputString);
+  const maskRows = computeMaskRows(inputString, ['backslash', 'escape', 'escaped', 'raw quotes', 'quotes', 'in string']);
 </script>
 
 <main>
