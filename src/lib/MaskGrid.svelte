@@ -68,6 +68,18 @@
     gridEl?.focus();
   }
 
+  function handleRewindClick() {
+    currentBlock = 0;
+    currentRow = 0;
+    gridEl?.focus();
+  }
+
+  function handleFastForwardClick() {
+    currentBlock = numBlocks - 1;
+    currentRow = rows.length - 1;
+    gridEl?.focus();
+  }
+
   // Viewport and cell measurement for centering
   let viewportWidth = 0;
   let totalCellsWidth = 0;
@@ -101,12 +113,17 @@
   <!-- Block label + Input row, with Step button spanning both -->
   <div class="input-group">
     <span class="label step-label">
-      <button class="step-btn" on:click={handleStepClick} disabled={atEnd}>Step &#x25B6;</button>
+      <span class="controls">
+        <button class="ctrl-btn" on:click={handleRewindClick} disabled={atStart}>&#x23EE;</button>
+        <button class="ctrl-btn" on:click={handleStepClick} disabled={atEnd}>&#x25B6;</button>
+        <button class="ctrl-btn" on:click={handleFastForwardClick} disabled={atEnd}>&#x23ED;</button>
+      </span>
     </span>
     <div class="input-group-cells">
       <!-- Block label -->
+      {#if numBlocks > 1}
       <div class="block-label-row">
-        <div class="cells-viewport" bind:clientWidth={viewportWidth}>
+        <div class="cells-viewport">
           <div class="cells" style:transform="translateX({translate}px)">
             <span class="block-label-spacer" style:width={spacerWidth}></span>
             <span class="block-label">
@@ -115,8 +132,9 @@
           </div>
         </div>
       </div>
+      {/if}
       <!-- Input cells -->
-      <div class="cells-viewport">
+      <div class="cells-viewport" bind:clientWidth={viewportWidth}>
         <div class="cells" bind:clientWidth={totalCellsWidth} style:transform="translateX({translate}px)">
           {#each chars as ch, i}
             <span
@@ -216,9 +234,41 @@
     padding: 0 12px 0 0;
   }
 
-  .label.step-label .step-btn {
-    width: 100%;
+  .controls {
+    display: flex;
+    gap: 2px;
     height: 100%;
+    align-items: center;
+  }
+
+  .ctrl-btn {
+    background: #e8eef6;
+    color: #555;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    padding: 0.3em 0.5em;
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .ctrl-btn:hover:not(:disabled) {
+    background: #d0daea;
+    border-color: #3366aa;
+    color: #333;
+  }
+
+  .ctrl-btn:disabled {
+    background: transparent;
+    color: #ccc;
+    border-color: #ddd;
+    cursor: default;
+    visibility: hidden;
+  }
+
+  .mask-grid:hover .ctrl-btn:disabled,
+  .mask-grid:focus-within .ctrl-btn:disabled {
+    visibility: visible;
   }
 
   .hints-row {
@@ -237,29 +287,6 @@
 
   .hints {
     color: #999;
-  }
-
-  .step-btn {
-    background: #e8eef6;
-    color: #555;
-    border: 1px solid #bbb;
-    border-radius: 3px;
-    padding: 0.3em 1em;
-    font-size: 16px;
-    cursor: pointer;
-  }
-
-  .step-btn:hover:not(:disabled) {
-    background: #d0daea;
-    border-color: #3366aa;
-    color: #333;
-  }
-
-  .step-btn:disabled {
-    background: transparent;
-    color: #ccc;
-    border-color: #ddd;
-    cursor: default;
   }
 
   .row {

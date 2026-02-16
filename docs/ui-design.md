@@ -14,6 +14,7 @@ Navigation has two axes:
   advances to the next block's first row.
 - **Block jumping** (Left / Right arrows): jumps to the previous/next block.
   Both directions set the row to the last (showing all masks for that block).
+- **Rewind / Fast-forward**: buttons to jump to the very beginning or end.
 
 ### Row Visibility
 
@@ -35,7 +36,14 @@ The grid shows three horizontal zones:
 - **Active** (current block): full brightness, vertical blue lane borders.
 - **Future** (after current block): input shown dimmed, mask rows blank.
 
-A "Block N of M" label floats centered above the active block.
+A "Block N of M" label floats centered above the active block. When there is
+only a single block, the label is hidden.
+
+### Controls Visibility
+
+The three control buttons (rewind, step, fast-forward) are hidden when
+disabled (i.e. at the start or end of the sequence) unless the grid is
+hovered or focused. This keeps the grid clean when fully revealed.
 
 ### Self-Contained Component
 

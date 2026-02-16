@@ -46,15 +46,17 @@ function escapeMask(backslash: boolean[]): boolean[] {
 }
 
 export function computeMaskRows(input: string): MaskRow[] {
+  const rawQuotes = charEqMask(input, '"');
   const backslash = charEqMask(input, '\\');
   const escape = escapeMask(backslash);
   const escaped = shiftMask(escape, 1);
-  const quotes = andNotMask(charEqMask(input, '"'), escaped);
+  const quotes = andNotMask(rawQuotes, escaped);
   const strings = shiftMask(prefixXorMask(quotes), 1);
 
   const color = '#8e44ad';
 
   return [
+    { label: 'raw quotes', color, mask: rawQuotes },
     { label: 'backslash',  color, mask: backslash },
     { label: 'escape',     color, mask: escape },
     { label: 'escaped',    color, mask: escaped, shift: 1 },
