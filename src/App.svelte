@@ -23,7 +23,8 @@
   </div>
   <h2>Strings</h2>
   <p>For example, in order to parse strings, simdjson has to recognize escaped quotes like `"quote: \""`. To do <em>that,</em> it first creates a "backslash bitmask" with a 1 in any position that has a backslash (e.g. <code>"\"" -&gt; 0100</code>). Then, it shifts that mask by 1 for an escaped character bitmask (<code>0010</code>). Now when it wants to find "real quotes", it creates a quote bitmask, and uses bitwise operations <code>&amp;~</code> to subtract out the escaped quotes, correctly yielding <code>1001</code>.</p>
-  <p>After this, all quotes are found, escaped quotes are removed, and a mask of "characters in strings" is produced between each pair of quotes. This is then used by later steps to filter out things inside strings.</p>
+  <p>After this, all quotes are found, escaped quotes are removed, and a mask of "characters in strings" is produced between each pair of quotes. (This uses a single "carryless multiply" operation which is worth explaining later, together with other math operations like subtraction.)</p>
+  <p>This is then used by later steps to filter out things inside strings.</p>
   <h2>Scalar Values</h2>
   <p>Detecting the beginning of a number or boolean value goes through a similar (but somewhat simpler) process. First, it finds scalar characters that aren't inside strings: characters that can be the start of a value like numbers, letters, and quotes. Then it uses a shift to find scalar characters whch don't have a scalar character <em>before</em> them--these are the ones that start.</p>
   <div class="figure">
@@ -56,7 +57,7 @@
 
   .figure {
     max-width: 680px;
-    margin: 1.5rem auto;
+    margin: 0.75rem auto;
   }
 
   .example-grid {
