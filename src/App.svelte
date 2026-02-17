@@ -32,10 +32,10 @@
         <li><a href="https://johnkeiser.com/tags/">Tags</a></li>
       </ul>
       <ul class="nav-right">
-        <li><a href="mailto:john@johnkeiser.com"><i class="far fa-envelope"></i></a></li>
-        <li><a href="https://github.com/jkeiser"><i class="fab fa-github"></i></a></li>
-        <li><a href="https://twitter.com/jkeiser2/"><i class="fab fa-twitter"></i></a></li>
-        <li><a href="https://www.linkedin.com/in/john-keiser-81618532/"><i class="fab fa-linkedin"></i></a></li>
+        <li><a href="mailto:john@johnkeiser.com" aria-label="Email"><i class="far fa-envelope"></i></a></li>
+        <li><a href="https://github.com/jkeiser" aria-label="GitHub"><i class="fab fa-github"></i></a></li>
+        <li><a href="https://twitter.com/jkeiser2/" aria-label="Twitter"><i class="fab fa-twitter"></i></a></li>
+        <li><a href="https://www.linkedin.com/in/john-keiser-81618532/" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a></li>
       </ul>
     </div>
   </div>
