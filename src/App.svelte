@@ -8,7 +8,7 @@
 
   // Main example
   const inputString = '{ "x": 100000, "esc": "\\\\\\"", "long": "foo\nbar\nbaz" }';
-  const maskRows = computeMaskRows(inputString, ['backslash', 'escape', 'escaped', 'raw quotes', 'quotes', 'in string']);
+  const maskRows = computeMaskRows(inputString, ['backslash', 'escape', 'escaped', 'raw quotes', 'quotes', 'in string', 'raw operators', 'operators', 'raw scalar chars', 'scalar chars', 'after scalar chars', 'scalars', 'index']);
 </script>
 
 <main>

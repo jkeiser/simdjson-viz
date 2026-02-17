@@ -114,10 +114,14 @@ describe('in string', () => {
 });
 
 describe('computeMaskRows', () => {
-  it('returns all six mask rows', () => {
+  it('returns all mask rows', () => {
     const rows = computeMaskRows('{}');
     const labels = rows.map(r => r.label);
-    expect(labels).toEqual(['raw quotes', 'backslash', 'escape', 'escaped', 'quotes', 'in string']);
+    expect(labels).toEqual([
+      'backslash', 'escape', 'escaped', 'raw quotes', 'quotes', 'in string',
+      'raw operators', 'operators', 'raw scalar chars', 'scalar chars',
+      'after scalar chars', 'scalars', 'index',
+    ]);
   });
 
   it('produces correct masks for the example string', () => {
