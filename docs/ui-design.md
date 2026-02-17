@@ -87,3 +87,15 @@ revealed. This avoids blanking data that was already computed.
 See comments in `MaskGrid.svelte` for details on: last-block padding,
 rgba vs opacity for dimming, box-shadow for input divider, and Svelte
 reactivity with closure functions.
+
+## Site Chrome
+
+Navbar and footer replicate the look of johnkeiser.com (Bootstrap 3 min_night
+theme) using standalone CSS. No Bootstrap or jQuery dependency.
+
+- **Navbar**: fixed top, steel-blue (`--accent: #386890`), nav links point to
+  `https://johnkeiser.com/...`. Mobile hamburger uses Svelte `$state` toggle.
+- **Footer**: matching steel-blue, credits Hugo/min_night, CC license link.
+- **Layout**: body is flex column with sticky footer. `#app` also flex column.
+- **Font**: Google Fonts Mina, loaded via CDN in `index.html`.
+- **Icons**: Font Awesome 5, loaded via CDN in `index.html`.
