@@ -43,7 +43,7 @@
   </ol>
   <p>The following visualization shows the full process in action! Hit the Play or Step button to step through simdjson as it figures out which quotes are real and then uses that to figure out which characters are inside strings.</p>
   <div class="figure">
-    <MaskGrid title="Full Algorithm" input={inputString} rows={maskRows} />
+    <MaskGrid title="Full Algorithm" input={inputString} rows={maskRows} initialBlock={2} initialRow={2} />
   </div>
   <p>github: <a href="https://github.com/jkeiser/simdjson-viz">https://github.com/jkeiser/simdjson-viz</a>.</p>
 </main>
