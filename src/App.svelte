@@ -4,7 +4,7 @@
 
   // Inline escape example
   const escapeExampleInput = '"\\\\\\""';
-  const escapeExampleRows = computeMaskRows(escapeExampleInput, ['backslash', 'escaped', 'raw quotes', 'quotes', 'in string']);
+  const escapeExampleRows = computeMaskRows(escapeExampleInput, ['backslash', 'escape', 'escaped', 'raw quotes', 'quotes', 'in string']);
 
   // Scalar example
   const scalarExampleInput = '[ 2.3e+4, "99999", true, false, null ]';
@@ -44,12 +44,15 @@
 <main>
   <h1>simdjson: Microparallel Parsing With Arithmetic</h1>
   <p>simdjson takes a unique "microparallel" approach to parsing JSON. Instead of processing a document character by character, simdjson processes the document 64 bytes at a time. For each block, it produces 64-bit *bitmasks* of features like quotes, arrays, and commas. It figures out more complicated masks like "which characters are in strings" using branch-free math and shift operations. Ultimately it produces a final index showing where each operator and value is in the JSON document.</p>
+  <p>Throughout this article you will see some live diagrams: you can step through these to see the simdjson algorithm in action. To make the whole thing easier to see, instead of showing a cryptic "00110101" for each bitmask, it instead shows a representation of which input characters are "on" in the mask. It also uses 8 byte blocks instead of 64, so you can see the algorithm run in smaller chunks.</p>
   <div class="example-grid">
-    <MaskGrid title="Escape Detection" input={escapeExampleInput} rows={escapeExampleRows} blockSize={8} initialBlock={0} initialRow={4} />
+    <MaskGrid title="Escape Detection" input={escapeExampleInput} rows={escapeExampleRows} blockSize={8} initialBlock={0} initialRow={5} />
   </div>
   <h2>Strings</h2>
-  <p>For example, in order to parse strings, simdjson has to recognize escaped quotes like `"quote: \""`. To do <em>that,</em> it first creates a "backslash bitmask" with a 1 in any position that has a backslash (e.g. <code>"\"" -&gt; 0100</code>). Then, it shifts that mask by 1 for an escaped character bitmask (<code>0010</code>). Now when it wants to find "real quotes", it creates a quote bitmask, and uses bitwise operations <code>&amp;~</code> to subtract out the escaped quotes, correctly yielding <code>1001</code>.</p>
-  <p>After this, all quotes are found, escaped quotes are removed, and a mask of "characters in strings" is produced between each pair of quotes. (This uses a single "carryless multiply" operation which is worth explaining later, together with other math operations like subtraction.)</p>
+  <p>To parse the document, simdjson first has to figure out which characters are in strings--pairs of quotes. But before it can do <strong>that,</strong> it has to figure out which quotes are "real" and not escaped. In <code>"\""</code>, the second quote is escaped.</p>
+  <p>To find <code>\"</code>, it first creates a "backslash bitmask" with a 1 in any position that has a backslash (e.g. <code>"\"" -&gt; 0100</code>). Then, it uses that to get a mask of escaped characters (<code>0010</code>)--you can think of this as just a shift by 1, but there's some clever math to handle longer runs of backslashes like <code>\\\\</code>.</p>
+  <p>Now that it knows what characters are escaped, it finds all quotes everywhere and uses bitwise <code>&amp;~</code> to subtract out the escaped quotes, correctly yielding <code>1001</code>.</p>
+  <p>After all quotes are found, and a mask of "characters in strings" is produced between each pair of quotes. (This uses a single "carryless multiply" operation which is worth explaining later, together with other math operations like subtraction.)</p>
   <p>This is then used by later steps to filter out things inside strings.</p>
   <h2>Scalar Values</h2>
   <p>Detecting the beginning of a number or boolean value goes through a similar (but somewhat simpler) process. First, it finds scalar characters that aren't inside strings: characters that can be the start of a value like numbers, letters, and quotes. Then it uses a shift to find scalar characters whch don't have a scalar character <em>before</em> them--these are the ones that start.</p>
