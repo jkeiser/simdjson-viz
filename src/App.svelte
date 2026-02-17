@@ -17,7 +17,7 @@
 
 <main>
   <h1>simdjson: Microparallel Parsing With Arithmetic</h1>
-  <p>simdjson takes a unique "microparallel" approach to parsing JSON. Instead of processing a document character by character, simdjson processes the document 64 bytes at a time, producing 64-bit *bitmasks* to indicate features like quotes, arrays, and commas. It then does more complex "context-dependent" logic in a branch-free manner, figuring out thing like "is this character escaped" and "is this character in a string" using math and shift operations.</p>
+  <p>simdjson takes a unique "microparallel" approach to parsing JSON. Instead of processing a document character by character, simdjson processes the document 64 bytes at a time. For each block, it produces 64-bit *bitmasks* of features like quotes, arrays, and commas. It figures out more complicated masks like "which characters are in strings" using branch-free math and shift operations. Ultimately it produces a final index showing where each operator and value is in the JSON document.</p>
   <div class="example-grid">
     <MaskGrid title="Escape Detection" input={escapeExampleInput} rows={escapeExampleRows} blockSize={8} initialBlock={0} initialRow={4} />
   </div>
