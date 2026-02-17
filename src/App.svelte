@@ -55,7 +55,7 @@
   }
 
   .figure {
-    max-width: 540px;
+    max-width: 680px;
     margin: 1.5rem auto;
   }
 
