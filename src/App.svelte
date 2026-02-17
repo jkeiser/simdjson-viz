@@ -17,7 +17,7 @@
   let navOpen = $state(false);
 </script>
 
-<nav class="site-nav">
+<nav class="site-nav" aria-label="Site navigation">
   <div class="nav-container">
     <span class="nav-brand">John Keiser</span>
     <button class="nav-toggle" onclick={() => navOpen = !navOpen} aria-label="Toggle navigation">
