@@ -13,7 +13,33 @@
   // Main example
   const inputString = '{ "x": 999999, "esc": "\\\\\\"", "long": "foo\nbar\nbaz" }';
   const maskRows = computeMaskRows(inputString, ['escaped', 'quotes', 'in string', 'operators', 'scalars', 'index']);
+
+  let navOpen = $state(false);
 </script>
+
+<nav class="site-nav">
+  <div class="nav-container">
+    <span class="nav-brand">John Keiser</span>
+    <button class="nav-toggle" onclick={() => navOpen = !navOpen} aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="nav-collapse" class:open={navOpen}>
+      <ul class="nav-links">
+        <li><a href="https://johnkeiser.com/">Home</a></li>
+        <li><a href="https://johnkeiser.com/post/">Posts</a></li>
+        <li><a href="https://johnkeiser.com/tags/">Tags</a></li>
+      </ul>
+      <ul class="nav-right">
+        <li><a href="mailto:john@johnkeiser.com"><i class="far fa-envelope"></i></a></li>
+        <li><a href="https://github.com/jkeiser"><i class="fab fa-github"></i></a></li>
+        <li><a href="https://twitter.com/jkeiser2/"><i class="fab fa-twitter"></i></a></li>
+        <li><a href="https://www.linkedin.com/in/john-keiser-81618532/"><i class="fab fa-linkedin"></i></a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
 <main>
   <h1>simdjson: Microparallel Parsing With Arithmetic</h1>
@@ -48,11 +74,17 @@
   <p>github: <a href="https://github.com/jkeiser/simdjson-viz">https://github.com/jkeiser/simdjson-viz</a>.</p>
 </main>
 
+<footer class="site-footer">
+  <p>Powered by <a href="https://gohugo.io">Hugo</a>. Themed by <a href="https://github.com/nathancday/min_night">min_night</a>.</p>
+  <p><a rel="license" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons"></i> Attribution 4.0 International license</a></p>
+</footer>
+
 <style>
   main {
     max-width: 800px;
     margin: 0 auto;
     padding: 2rem;
+    flex: 1;
   }
 
   .figure {
