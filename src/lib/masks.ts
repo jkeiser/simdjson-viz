@@ -100,7 +100,7 @@ export function computeMaskRows(input: string, names?: string[]): MaskRow[] {
     { label: 'operators',        color: operatorColor, mask: operators },
     { label: 'raw scalar chars', color: scalarColor,   mask: rawScalarChars },
     { label: 'scalar chars',     color: scalarColor,   mask: scalarChars },
-    { label: 'after scalar chars', color: scalarColor, mask: afterScalarChars, shift: 1 },
+    { label: 'after scalars', color: scalarColor, mask: afterScalarChars, shift: 1 },
     { label: 'scalars',          color: scalarColor,   mask: scalars },
     { label: 'index',            color: indexColor,     mask: index },
   ];

@@ -120,7 +120,7 @@ describe('computeMaskRows', () => {
     expect(labels).toEqual([
       'backslash', 'escape', 'escaped', 'raw quotes', 'quotes', 'in string',
       'raw operators', 'operators', 'raw scalar chars', 'scalar chars',
-      'after scalar chars', 'scalars', 'index',
+      'after scalars', 'scalars', 'index',
     ]);
   });
 
